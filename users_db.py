@@ -1,7 +1,7 @@
 import sqlite3 as sql
 from telegram_user import tg_user
 
-def db_get_user_by_id(id: int, self_id = 0) -> tg_user:
+def db_get_user_by_id(id: int) -> tg_user:
     try:
             connection = sql.connect('users.db')
             cursor = connection.cursor()
@@ -17,11 +17,7 @@ def db_get_user_by_id(id: int, self_id = 0) -> tg_user:
             user = tg_user(data[0], username=data[1], first_name=data[2], last_name=data[3], user_trust = data[4], comments = data[5], is_bot = data[6], lg_code = data[7], admin = data[8])
             return user
     except: 
-        if self_id == 0:
-            ...
-        else:
-            print("get_by_id_error")
-            return db_get_user_by_id(self_id)
+            return db_get_user_by_id(0)
 
 def db_add_comment(uid, data: str = None) -> None:
     try:

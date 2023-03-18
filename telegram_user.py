@@ -10,6 +10,12 @@ class tg_user(object):
         self.lg_code = lg_code
         self.admin = admin
 
+    def info(self, full = 0):
+        data = f"User id: {self.id}\nUsername: {self.username}\nFirst Name: {self.first_name}\nLast name: {self.last_name}\nTrust Factor: {self.trust_factor}\nComments: {self.comments}"
+        if full == 1:
+            data += f"Is Bot: {self.is_bot}, LG_Code: {self.lg_code}, Is Admin: {self.admin}"
+        return data
+
     def name(self) -> str:
         return self.username
 

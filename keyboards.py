@@ -1,26 +1,25 @@
-﻿from aiogram import types
+﻿from aiogram.types import KeyboardButton
+from aiogram.types.web_app_info import WebAppInfo
 
-kb_1 = [
+kb_main = [
         [
-            types.KeyboardButton(text="/drone"),
-            types.KeyboardButton(text="/help"),
-            types.KeyboardButton(text="/close")
-        ],
-]
-kb_2 = [
-        [
-            types.KeyboardButton(text="/place"),
-            types.KeyboardButton(text="/orders"),
-            types.KeyboardButton(text="/cancel")
+            KeyboardButton(text="Заказ такси 🚖"),
+            KeyboardButton(text="Доставка еды 🥂"),
         ],
         [
-            types.KeyboardButton(text="/close")
+            KeyboardButton(text="Информация о проекте"),
+        ],
+        [
+            KeyboardButton("GitHub", web_app=WebAppInfo(url = "https://github.com/zeotq/b2c_bot4b"))
+        ],
+        [
+            KeyboardButton(text="Закрыть")
         ],
 ]
 kb_admin = [
     [
-        types.KeyboardButton(text = "get_user_by_id"),
-        types.KeyboardButton(text = "add_comment"),
-        types.KeyboardButton(text = "set_trustfactor")
+        KeyboardButton(text = "get_user_by_id"),
+        KeyboardButton(text = "add_comment"),
+        KeyboardButton(text = "set_trustfactor")
         ]
 ]

@@ -17,11 +17,7 @@ with open("token", "r") as f:
     dp = Dispatcher(bot, storage=storage)
 
 keyboard_main_menu = types.ReplyKeyboardMarkup(
-    keyboard=keyboards.kb_1,
-    resize_keyboard=True,
-)
-keyboard_dronedb = types.ReplyKeyboardMarkup(
-    keyboard=keyboards.kb_2,
+    keyboard=keyboards.kb_main,
     resize_keyboard=True,
 )
 keyboard_admin = types.ReplyKeyboardMarkup(
@@ -64,7 +60,7 @@ class Form_Admin(StatesGroup):
 
 @dp.message_handler(commands=['admin'])
 async def admin_page_0(message: types.Message):
-    user = users_db.db_get_user_by_id(message.text, message.from_user.id)
+    user = users_db.db_get_user_by_id(message.from_user.id)
     if user.isAdmin():
         await Form_Admin.page_0.set()
         await message.answer('<b>Открыта панель администратора</b>', parse_mode="HTML", reply_markup = keyboard_admin, allow_sending_without_reply=True)
@@ -83,16 +79,23 @@ async def admin_page_1(message: types.Message, state: FSMContext):
 async def admin_page_3(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         if data[0] == "get_user_by_id":
-            answer = users_db.db_get_user_by_id(int(message.text), message.from_user.id)
-            await bot.send_message(message.from_user.id, text=answer)
+            answer = users_db.db_get_user_by_id(message.text)
+            data = answer.info()
+            await bot.send_message(message.from_user.id, text=data)
             await state.finish()
         elif data[0] == "add_comment":
+            await bot.send_message(message.from_user.id, text=users_db.db_get_user_by_id(message.text).getComments())
             data[1] = message.text
+            await bot.send_message(message.from_user.id, text="Send comment:")
             await Form_Admin.next()
         elif data[0] == "set_trustfactor":
             data[1] = message.text
             await bot.send_message(message.from_user.id, text=users_db.db_get_user_by_id(data[1]).getTrustfactor())
+            await bot.send_message(message.from_user.id, text="Send delta trust:")
             await Form_Admin.next()
+        else:
+            await bot.send_message(message.from_user.id, text="Wrong command")
+            await state.finish()
 
 @dp.message_handler(state=Form_Admin.page_3)
 async def admin_page_3(message: types.Message, state: FSMContext):
@@ -110,6 +113,10 @@ async def close_menu_command(message: types.Message):
     await message.delete()
     await asyncio.sleep(delay = 5)
     await msg.delete()
+
+@dp.message_handler(commands=['id'])
+async def get_id(message: types.Message):
+    await bot.send_message(a:=message.from_user.id, text = a)
 
 @dp.message_handler(commands=['place'])
 async def palce_oreder(message: types.Message):
