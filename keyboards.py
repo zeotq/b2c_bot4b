@@ -16,6 +16,16 @@ kb_main = [
             KeyboardButton(text="Закрыть")
         ],
 ]
+kb_taxi_0 = [
+    [
+        KeyboardButton(text="Регистрация")],
+    [
+        KeyboardButton(text="Закрыть")]]
+
+kb_taxi_1 = [
+    [KeyboardButton(text="Заказать такси")]]
+
+
 kb_admin = [
     [
         KeyboardButton(text = "get_user_by_id"),

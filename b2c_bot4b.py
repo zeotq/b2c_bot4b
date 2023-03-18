@@ -1,13 +1,12 @@
 ﻿import asyncio
+from random import choice
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-
 import user_data_save
 import users_db
 import keyboards
-from manual_data_base_interaction import data_base
 
 
 with open("token", "r") as f:
@@ -15,7 +14,6 @@ with open("token", "r") as f:
     bot = Bot(TOKEN)
     storage = MemoryStorage()
     dp = Dispatcher(bot, storage=storage)
-
 keyboard_main_menu = types.ReplyKeyboardMarkup(
     keyboard=keyboards.kb_main,
     resize_keyboard=True,
@@ -24,41 +22,51 @@ keyboard_admin = types.ReplyKeyboardMarkup(
     keyboard=keyboards.kb_admin,
     resize_keyboard=True,
 )
+keyboard_taxi_0 = types.ReplyKeyboardMarkup(
+    keyboard=keyboards.kb_taxi_0,
+    resize_keyboard=True,
+)
+keyboard_taxi_1 = types.ReplyKeyboardMarkup(
+    keyboard=keyboards.kb_taxi_1,
+    resize_keyboard=True,
+)
 
-class Form_order_reg(StatesGroup):
-    adress = State()
-    time = State()
 
-help_info = "Помощь? Нет."
-async def on_startup():
-    print("Выполнен успешный запуск!", end = "\n\n\n")
-
-@dp.message_handler(commands=['start'])
-async def start_command(message: types.Message):
-    await message.answer('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboard_main_menu, allow_sending_without_reply=True)
-    user_data_save.data_writer(dict(message.from_user))
-    await message.delete()  
-
-@dp.message_handler(commands=['menu'])
-async def menu_command(message: types.Message):
-    await message.reply(text = "/drone - для работы с дронами\n/help - получить помощь\n/close - закрыть меню", reply_markup = keyboard_main_menu, allow_sending_without_reply=True)
-    await message.delete()
-
-@dp.message_handler(commands=['zakaz'])
-async def getstatus_command(message: types.Message):
-    await message.answer('/place - оформить заказ\n/orders - ваши заказы\n/cancel - отменить заказ\n/close - закрыть меню', reply_markup = keyboard_dronedb, allow_sending_without_reply=True)
-
-@dp.message_handler(commands=['help'])
-async def help_command(message: types.Message):
-   await message.reply(text=help_info)
-   await message.delete()
-
+class GlobalState(StatesGroup):
+    main_menu = State()
+    taxi_service = State()
+    restaurant_service = State() 
+class TaxiState(StatesGroup):
+    taxi_service_reg = State()
+    taxi_service_main = State()
 class Form_Admin(StatesGroup):
     page_0 = State()
     page_2 = State()
     page_3 = State()
 
-@dp.message_handler(commands=['admin'])
+
+@dp.message_handler(commands=['start'])
+async def start_command(message: types.Message):
+    await message.answer('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboard_main_menu, allow_sending_without_reply=True)
+    user_data_save.data_writer(dict(message.from_user))
+    await message.delete()
+
+@dp.message_handler(commands=['menu'], state = "*")
+async def menu_command(message: types.Message):
+    await message.reply(text = "Главное меню", reply_markup = keyboard_main_menu, allow_sending_without_reply=True)
+    await message.delete()
+    await GlobalState.first()
+
+@dp.message_handler(commands=['help'])
+async def help_command(message: types.Message):
+   await message.reply(text="None")
+   await message.delete()
+
+@dp.message_handler(commands=['id'], state = "*")
+async def get_id(message: types.Message):
+    await bot.send_message(a:=message.from_user.id, text = a)
+
+@dp.message_handler(commands=['admin'], state = "*")
 async def admin_page_0(message: types.Message):
     user = users_db.db_get_user_by_id(message.from_user.id)
     if user.isAdmin():
@@ -67,6 +75,15 @@ async def admin_page_0(message: types.Message):
     else:
         await message.reply(text="Недостаточно прав.")
         await message.delete()
+
+@dp.message_handler(state='*', commands=['exit', 'close'])
+async def close_menu_command(message: types.Message):
+    await GlobalState.main_menu.set()
+    msg = await message.reply(text='Главное меню', reply_markup = keyboard_main_menu)
+    await message.delete()
+    await asyncio.sleep(delay = 5)
+    await msg.delete()
+    await GlobalState.first()
 
 @dp.message_handler(state=Form_Admin.page_0)
 async def admin_page_1(message: types.Message, state: FSMContext):
@@ -107,62 +124,36 @@ async def admin_page_3(message: types.Message, state: FSMContext):
          await bot.send_message(message.from_user.id, text="Complete")
     await state.finish()
 
-@dp.message_handler(state='*', commands=['close'])
-async def close_menu_command(message: types.Message):
-    msg = await message.reply(text='Открыть меню снова - /menu', reply_markup=types.ReplyKeyboardRemove())
-    await message.delete()
-    await asyncio.sleep(delay = 5)
-    await msg.delete()
+@dp.message_handler(state=GlobalState.taxi_service)
+async def taxi_reg(message: types.Message):
+    text = message.text
+    print(text)
 
-@dp.message_handler(commands=['id'])
-async def get_id(message: types.Message):
-    await bot.send_message(a:=message.from_user.id, text = a)
+@dp.message_handler(state="*")
+async def silkway(message: types.Message):
+    text = message.text
+    if text == "Заказ такси 🚖":
+        await GlobalState.taxi_service.set()
+        await TaxiState.taxi_service_reg.set()
+        await message.answer('<b>Сервис такси:</b>', parse_mode="HTML", reply_markup = keyboard_taxi_0, allow_sending_without_reply=True)
+    elif text == "Доставка еды 🥂":
+        await GlobalState.restaurant_service.set()
+    elif text == "Информация о проекте":
+        pass
+    elif text == "Закрыть":
+        await message.reply(text='Открыть снова - /menu', reply_markup = types.ReplyKeyboardRemove())
+        await message.delete()
+        await asyncio.sleep(delay = 5)
+    else:
+        data = [
+        "Я тебя не понял", "Команда не распознана", "Проверьте корректность сообщения", "Нет"
+        ]
+        await message.answer(text = choice(data))
 
-@dp.message_handler(commands=['place'])
-async def palce_oreder(message: types.Message):
-    await Form_order_reg.adress.set()
-    await bot.send_message(message.from_user.id, text='Введите ваш адрес:',  reply_markup=types.ReplyKeyboardRemove())
-
-@dp.message_handler(commands=['show_drone_db'])
-async def show_drone_db(message: types.Message):
-    await message.reply(text= f'{data_base(1)}')
-    await message.delete()
-
-@dp.message_handler(commands=['reset_drone_db'])
-async def reset_drone_db(message: types.Message):
-    msg = await message.reply(text= f'{data_base(2)}')
-    await message.delete()
-    await asyncio.sleep(delay = 2)
-    await msg.delete()
-
-@dp.message_handler(state=Form_order_reg.adress)
-async def adress(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['adress'] = message.text
-    await bot.send_message(message.from_user.id, text='Введите время:')
-    await Form_order_reg.next()
-
-@dp.message_handler(state=Form_order_reg.time)
-async def adress(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['phone'] = message.text
-    await bot.send_message(message.from_user.id, text = f"Оформлен заказ на адрес: {data['adress']}, по номеру телефона {data['phone']}", reply_markup = keyboard_dronedb)
-    #   В этом месте будет вызываться функция добавляющая заказ в базу данных. 
-    await state.finish()
-
-#   Любые некомандные сообщение в случае, когда state не обособлен будет отпраляться напрямую в личные сообщения модератора для анализа
 @dp.message_handler()
 async def backcall(message: types.Message):
-    try:
-        if message.from_user.id == 802558859:
-            await message.answer(text = 'Admin_Profile')
-        else:
-            await message.answer(text = message.text.capitalize())
-            await bot.send_message(802558859, f"{message.from_user.full_name} \ {message.from_user.id}: {message.text}")
-    except:
-        ...
+    pass
 
-#   Функция отправки сообщений пользователю непосредственно через userID
 @dp.message_handler(state='*', commands=['send'])
 async def send(message: types.Message):
     try:
