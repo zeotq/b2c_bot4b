@@ -10,7 +10,7 @@ kb_main = [
             KeyboardButton(text="Информация о проекте"),
         ],
         [
-            KeyboardButton("GitHub", web_app=WebAppInfo(url = "https://github.com/zeotq/b2c_bot4b"))
+            KeyboardButton("GitHub", web_app=WebAppInfo(url = "https://github.com/zeotq/b2c_bot4b.git"))
         ],
         [
             KeyboardButton(text="Закрыть")
