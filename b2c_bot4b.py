@@ -9,11 +9,11 @@ import users_db
 import keyboards
 
 
-#with open("token", "r") as f:
-#    TOKEN = f.readline()
-#    bot = Bot(TOKEN)
-#    storage = MemoryStorage()
-#    dp = Dispatcher(bot, storage=storage)
+with open("token", "r") as f:
+    TOKEN = f.readline()
+    bot = Bot(TOKEN)
+    storage = MemoryStorage()
+    dp = Dispatcher(bot, storage=storage)
 keyboard_main_menu = types.ReplyKeyboardMarkup(
     keyboard=keyboards.kb_main,
     resize_keyboard=True,
