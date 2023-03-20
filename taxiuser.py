@@ -10,7 +10,7 @@ class taxiuser(object):
             self.name = name
             self.phone_number = phone_number
         else:
-            self.id == uid
+            self.id = uid
             self.phone_number = db_data[1]
             self.name = db_data[2]
 
@@ -35,8 +35,10 @@ class taxiuser(object):
     
     def write_user(self) -> None:
         connection = sql.connect('users_taxi.db')
-        command = f"""INSERT INTO users (id, phone, name) values ('{self.id}', '{self.phone_number}', '{self.name}')"""
-        print(f"ID: {self.id} \ Username: {self.name}\nadded to database")
+        if connection.execute(f"""SELECT * FROM users WHERE id = {self.id}""").fetchone() == None:
+            command = f"""INSERT INTO users (id, phone, name) values ('{self.id}', '{self.phone_number}', '{self.name}')"""
+        else:
+            command = f"""UPDATE users set (phone, name) = ('{self.phone_number}', '{self.name}') WHERE ID = '{self.id}'"""
         connection.execute(command)
         connection.commit()
         connection.close()

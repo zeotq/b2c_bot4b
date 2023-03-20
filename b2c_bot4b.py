@@ -115,7 +115,7 @@ async def taxi_reg_main(message: types.Message):
          user_data[f"{message.from_user.id}"] = user
          print(user_data[f"{message.from_user.id}"].get_user_data())
          if user.isFull():
-             await message.answer(f'Номер {user.phone_number} сохранён', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+             await message.answer(f'Номер <b>{user.phone_number}</b> сохранён', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
 
 @dp.message_handler(state=TaxiState.service_reg_main)
 async def taxi_reg_main(message: types.Message):
@@ -128,7 +128,7 @@ async def taxi_reg_main(message: types.Message):
         if message.text == "Имя":
             await TaxiState.service_reg_name.set()
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
-        elif message.text == "Далее":
+        else:
             if user.isFull():
                 user.write_user()
                 await message.answer(f'<b>Успешно!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
