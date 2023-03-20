@@ -16,10 +16,9 @@ with open("token.txt", "r") as f:
 
 class GlobalState(StatesGroup):
     main_menu = State()
-    taxi_service = State()
-    restaurant_service = State() 
 class TaxiState(StatesGroup):
     taxi_service_reg = State()
+    taxi_service_reg_name = State()
     taxi_service_main = State()
 class Form_Admin(StatesGroup):
     page_0 = State()
@@ -59,13 +58,10 @@ async def admin_page_0(message: types.Message):
         await message.reply(text="Недостаточно прав.")
         await message.delete()
 
-@dp.message_handler(state='*', commands=['exit', 'close'])
+@dp.message_handler(commands=['exit', 'close'], state='*')
 async def close_menu_command(message: types.Message):
-    await GlobalState.main_menu.set()
-    msg = await message.reply(text='Главное меню', reply_markup = keyboards.keyboard_main_menu)
+    await message.reply(text='Главное меню', reply_markup = keyboards.keyboard_main_menu)
     await message.delete()
-    await asyncio.sleep(delay = 5)
-    await msg.delete()
     await GlobalState.first()
 
 @dp.message_handler(state=Form_Admin.page_0)
@@ -107,10 +103,11 @@ async def admin_page_3(message: types.Message, state: FSMContext):
          await bot.send_message(message.from_user.id, text="Complete")
     await state.finish()
 
-@dp.message_handler(state=GlobalState.taxi_service)
-async def taxi_reg(message: types.Message):
-    text = message.text
-    print(text)
+@dp.message_handler(state=TaxiState.taxi_service_reg)
+async def taxi_reg(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        pass
+    
 
 @dp.message_handler(state="*")
 async def silkway(message: types.Message):
@@ -119,7 +116,7 @@ async def silkway(message: types.Message):
         await TaxiState.taxi_service_reg.set()
         await message.answer('<b>Сервис такси:</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0, allow_sending_without_reply=True)
     elif text == "Доставка еды 🥂":
-        await GlobalState.restaurant_service.set()
+        await TaxiState.taxi_service_reg.set()
     elif text == "Информация о проекте":
         pass
     elif text == "Закрыть":
