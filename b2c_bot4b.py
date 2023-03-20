@@ -108,20 +108,21 @@ async def admin_page_3(message: types.Message, state: FSMContext):
 @dp.message_handler(state=TaxiState.service_reg_main, content_types=types.ContentType.CONTACT)
 async def taxi_reg_main(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-         user = data[message.from_user.id]
+         user = data[f"{message.from_user.id}"]
          user.update(phone_number=message.contact.phone_number)
-         data[message.from_user.id] = user
-         print(data[message.from_user.id].get_user_data())
+         print(user.get_user_data())
+         data[f"{message.from_user.id}"] = user
+         print(data[f"{message.from_user.id}"].get_user_data())
 
 @dp.message_handler(state=TaxiState.service_reg_main)
 async def taxi_reg_main(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        user = data[message.from_user.id]
+        user = data[f"{message.from_user.id}"]
         if user.isFull():
             print("chtck_0")
             await message.answer(f'<b>Вы можете продожить или изменить данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
         if message.text == "Имя":
-            await TaxiState.service_reg_name.set()
+            await TaxiState.next()
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
         elif message.text == "Далее":
             if user.isFull():
@@ -130,30 +131,30 @@ async def taxi_reg_main(message: types.Message, state: FSMContext):
                 await state.finish()
                 await TaxiState.service_main.set()
             else: pass
-        print(data[message.from_user.id].get_user_data())
+        print(data[f"{message.from_user.id}"].get_user_data())
 
 @dp.message_handler(state=TaxiState.service_reg)
 async def taxi_reg_0(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         if message.text == "Регистрация":
             user = taxiuser(message.from_user.id)
-            data[message.from_user.id] = user
+            data[f"{message.from_user.id}"] = user
             if user.isFull():
                 await message.answer(f'<b>Ваш аккаунт найден!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
             else:
                 await message.answer(f'<b>Укажите актуальные номер телефона и имя</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
-            await TaxiState.service_reg_main.set()
-            print(data[message.from_user.id].get_user_data())
+            await TaxiState.next()
+            print(data[f"{message.from_user.id}"].get_user_data())
 
 @dp.message_handler(state=TaxiState.service_reg_name)
 async def taxi_reg_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        user = data[message.from_user.id]
+        user = data[f"{message.from_user.id}"]
         user.update(name = message.text)
-        data[message.from_user.id] = user
+        data[f"{message.from_user.id}"] = user
         await message.answer(f'Имя пользователя <b>{user.name}</b> сохранено', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
-        await TaxiState.service_reg_main.set()
-        print(data[message.from_user.id].get_user_data())
+        await TaxiState.previous()
+        print(data[f"{message.from_user.id}"].get_user_data())
 
 @dp.message_handler(state="*")
 async def silkway(message: types.Message):
