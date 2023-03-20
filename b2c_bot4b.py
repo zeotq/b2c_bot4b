@@ -8,7 +8,7 @@ import user_data_save
 import users_db
 import keyboards
 
-with open("token", "r") as f:
+with open("token.txt", "r") as f:
     TOKEN = f.readline()
     bot = Bot(TOKEN)
     storage = MemoryStorage()
