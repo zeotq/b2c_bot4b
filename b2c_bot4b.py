@@ -110,7 +110,6 @@ async def taxi_reg_main(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
          user = data[message.from_user.id]
          user.update(phone_number=message.contact.phone_number)
-         print(user.get_user_data())
          data[message.from_user.id] = user
          print(data[message.from_user.id].get_user_data())
 
@@ -118,16 +117,13 @@ async def taxi_reg_main(message: types.Message, state: FSMContext):
 async def taxi_reg_main(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         user = data[message.from_user.id]
-        print(user.get_user_data())
         if user.isFull():
             print("chtck_0")
-            print(user.get_user_data())
             await message.answer(f'<b>Вы можете продожить или изменить данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
         if message.text == "Имя":
             await TaxiState.service_reg_name.set()
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
         elif message.text == "Далее":
-            print(user.get_user_data())
             if user.isFull():
                 user.write_user()
                 await message.answer(f'<b>Успешно!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
