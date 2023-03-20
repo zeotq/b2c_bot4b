@@ -132,10 +132,6 @@ async def silkway(message: types.Message):
         ]
         await message.answer(text = choice(data))
 
-@dp.message_handler()
-async def backcall(message: types.Message):
-    pass
-
 @dp.message_handler(state='*', commands=['send'])
 async def send(message: types.Message):
     try:
