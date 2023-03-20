@@ -113,7 +113,7 @@ async def taxi_reg(message: types.Message, state: FSMContext):
             if user.isFull():
                 await message.answer(f'<b>Ваш аккаунт найден!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish, allow_sending_without_reply=True)
             else:
-                await message.answer(f'<b>Необходимо закончить регистрацию!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish, allow_sending_without_reply=True)
+                await message.answer(f'<b>Необходимо закончить регистрацию!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg, allow_sending_without_reply=True)
         
     
 
