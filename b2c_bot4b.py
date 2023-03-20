@@ -8,7 +8,6 @@ import user_data_save
 import users_db
 import keyboards
 
-
 with open("token", "r") as f:
     TOKEN = f.readline()
     bot = Bot(TOKEN)
@@ -30,7 +29,6 @@ keyboard_taxi_1 = types.ReplyKeyboardMarkup(
     keyboard=keyboards.kb_taxi_1,
     resize_keyboard=True,
 )
-
 
 class GlobalState(StatesGroup):
     main_menu = State()
