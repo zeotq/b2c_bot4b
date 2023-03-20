@@ -131,7 +131,6 @@ async def taxi_reg(message: types.Message):
 async def silkway(message: types.Message):
     text = message.text
     if text == "Заказ такси 🚖":
-        await GlobalState.taxi_service.set()
         await TaxiState.taxi_service_reg.set()
         await message.answer('<b>Сервис такси:</b>', parse_mode="HTML", reply_markup = keyboard_taxi_0, allow_sending_without_reply=True)
     elif text == "Доставка еды 🥂":
