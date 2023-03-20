@@ -13,22 +13,6 @@ with open("token", "r") as f:
     bot = Bot(TOKEN)
     storage = MemoryStorage()
     dp = Dispatcher(bot, storage=storage)
-keyboard_main_menu = types.ReplyKeyboardMarkup(
-    keyboard=keyboards.kb_main,
-    resize_keyboard=True,
-)
-keyboard_admin = types.ReplyKeyboardMarkup(
-    keyboard=keyboards.kb_admin,
-    resize_keyboard=True,
-)
-keyboard_taxi_0 = types.ReplyKeyboardMarkup(
-    keyboard=keyboards.kb_taxi_0,
-    resize_keyboard=True,
-)
-keyboard_taxi_1 = types.ReplyKeyboardMarkup(
-    keyboard=keyboards.kb_taxi_1,
-    resize_keyboard=True,
-)
 
 class GlobalState(StatesGroup):
     main_menu = State()
@@ -45,19 +29,20 @@ class Form_Admin(StatesGroup):
 
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    await message.answer('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboard_main_menu, allow_sending_without_reply=True)
+    await message.answer('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu, allow_sending_without_reply=True)
     user_data_save.data_writer(dict(message.from_user))
-    await message.delete()
-
-@dp.message_handler(commands=['menu'], state = "*")
-async def menu_command(message: types.Message):
-    await message.reply(text = "Главное меню", reply_markup = keyboard_main_menu, allow_sending_without_reply=True)
     await message.delete()
     await GlobalState.first()
 
-@dp.message_handler(commands=['help'])
+@dp.message_handler(commands=['menu'], state = "*")
+async def menu_command(message: types.Message):
+    await message.reply('<b>Главное меню</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu, allow_sending_without_reply=True)
+    await message.delete()
+    await GlobalState.first()
+
+@dp.message_handler(commands=['help'], state = "*")
 async def help_command(message: types.Message):
-   await message.reply(text="None")
+   await message.reply(text="/menu - открыть меню,\n/close - закрыть")
    await message.delete()
 
 @dp.message_handler(commands=['id'], state = "*")
@@ -69,7 +54,7 @@ async def admin_page_0(message: types.Message):
     user = users_db.db_get_user_by_id(message.from_user.id)
     if user.isAdmin():
         await Form_Admin.page_0.set()
-        await message.answer('<b>Открыта панель администратора</b>', parse_mode="HTML", reply_markup = keyboard_admin, allow_sending_without_reply=True)
+        await message.answer('<b>Открыта панель администратора</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_admin, allow_sending_without_reply=True)
     else:
         await message.reply(text="Недостаточно прав.")
         await message.delete()
@@ -77,7 +62,7 @@ async def admin_page_0(message: types.Message):
 @dp.message_handler(state='*', commands=['exit', 'close'])
 async def close_menu_command(message: types.Message):
     await GlobalState.main_menu.set()
-    msg = await message.reply(text='Главное меню', reply_markup = keyboard_main_menu)
+    msg = await message.reply(text='Главное меню', reply_markup = keyboards.keyboard_main_menu)
     await message.delete()
     await asyncio.sleep(delay = 5)
     await msg.delete()
@@ -132,7 +117,7 @@ async def silkway(message: types.Message):
     text = message.text
     if text == "Заказ такси 🚖":
         await TaxiState.taxi_service_reg.set()
-        await message.answer('<b>Сервис такси:</b>', parse_mode="HTML", reply_markup = keyboard_taxi_0, allow_sending_without_reply=True)
+        await message.answer('<b>Сервис такси:</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0, allow_sending_without_reply=True)
     elif text == "Доставка еды 🥂":
         await GlobalState.restaurant_service.set()
     elif text == "Информация о проекте":

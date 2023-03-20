@@ -1,4 +1,4 @@
-﻿from aiogram.types import KeyboardButton
+﻿from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from aiogram.types.web_app_info import WebAppInfo
 
 kb_main = [
@@ -33,3 +33,21 @@ kb_admin = [
         KeyboardButton(text = "set_trustfactor")
         ]
 ]
+
+
+keyboard_main_menu = ReplyKeyboardMarkup(
+    keyboard=kb_main,
+    resize_keyboard=True,
+)
+keyboard_admin = ReplyKeyboardMarkup(
+    keyboard=kb_admin,
+    resize_keyboard=True,
+)
+keyboard_taxi_0 = ReplyKeyboardMarkup(
+    keyboard=kb_taxi_0,
+    resize_keyboard=True,
+)
+keyboard_taxi_1 = ReplyKeyboardMarkup(
+    keyboard=kb_taxi_1,
+    resize_keyboard=True,
+)
