@@ -107,7 +107,14 @@ async def admin_page_3(message: types.Message, state: FSMContext):
 @dp.message_handler(state=TaxiState.taxi_service_reg)
 async def taxi_reg(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        pass
+        if message.text == "Регистрация":
+            user = taxiuser(message.from_user.id)
+            data[message.from_user.id] = user
+            if user.isFull():
+                await message.answer(f'<b>Ваш аккаунт найден!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish, allow_sending_without_reply=True)
+            else:
+                await message.answer(f'<b>Необходимо закончить регистрацию!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish, allow_sending_without_reply=True)
+        
     
 
 @dp.message_handler(state="*")

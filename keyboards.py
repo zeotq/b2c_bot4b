@@ -23,8 +23,25 @@ kb_taxi_0 = [
         KeyboardButton(text="Закрыть")]]
 
 kb_taxi_1 = [
-    [KeyboardButton(text="Заказать такси")]]
+    [
+        KeyboardButton(text="Номер телефона"),
+        KeyboardButton(text="Имя"),
+    ],
+    [
+        KeyboardButton(text="Закрыть")    
+    ]
+]
 
+kb_taxi_2 = [
+    [
+        KeyboardButton(text="Номер телефона"),
+        KeyboardButton(text="Имя"),
+    ],
+    [
+        KeyboardButton(text="Закрыть"),
+        KeyboardButton(text="Далее")    
+    ]
+]
 
 kb_admin = [
     [
@@ -33,7 +50,6 @@ kb_admin = [
         KeyboardButton(text = "set_trustfactor")
         ]
 ]
-
 
 keyboard_main_menu = ReplyKeyboardMarkup(
     keyboard=kb_main,
@@ -47,7 +63,12 @@ keyboard_taxi_0 = ReplyKeyboardMarkup(
     keyboard=kb_taxi_0,
     resize_keyboard=True,
 )
-keyboard_taxi_1 = ReplyKeyboardMarkup(
+keyboard_taxi_reg = ReplyKeyboardMarkup(
     keyboard=kb_taxi_1,
     resize_keyboard=True,
 )
+keyboard_taxi_reg_finish = ReplyKeyboardMarkup(
+    keyboard=kb_taxi_2,
+    resize_keyboard=True,
+)
+
