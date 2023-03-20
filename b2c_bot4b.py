@@ -19,6 +19,7 @@ class GlobalState(StatesGroup):
     main_menu = State()
 class TaxiState(StatesGroup):
     taxi_service_reg = State()
+    taxi_service_reg_main = State()
     taxi_service_reg_name = State()
     taxi_service_main = State()
 class Form_Admin(StatesGroup):
@@ -29,14 +30,14 @@ class Form_Admin(StatesGroup):
 
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    await message.answer('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu, allow_sending_without_reply=True)
+    await message.reply('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu)
     user_data_save.data_writer(dict(message.from_user))
     await message.delete()
     await GlobalState.first()
 
 @dp.message_handler(commands=['menu'], state = "*")
 async def menu_command(message: types.Message):
-    await message.reply('<b>Главное меню</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu, allow_sending_without_reply=True)
+    await message.reply('<b>Главное меню</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu)
     await message.delete()
     await GlobalState.first()
 
@@ -54,7 +55,7 @@ async def admin_page_0(message: types.Message):
     user = users_db.db_get_user_by_id(message.from_user.id)
     if user.isAdmin():
         await Form_Admin.page_0.set()
-        await message.answer('<b>Открыта панель администратора</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_admin, allow_sending_without_reply=True)
+        await message.reply('<b>Открыта панель администратора</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_admin)
     else:
         await message.reply(text="Недостаточно прав.")
         await message.delete()
@@ -104,6 +105,25 @@ async def admin_page_3(message: types.Message, state: FSMContext):
          await bot.send_message(message.from_user.id, text="Complete")
     await state.finish()
 
+@dp.message_handler(state=TaxiState.taxi_service_reg_main)
+async def taxi_reg(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        user = data[message.from_user.id]
+        if user.isFull:
+            await message.reply(f'<b>Вы можете продожить или изменить данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+        if message.text == "Имя":
+            await TaxiState.taxi_service_reg_name.set()
+            await message.answer("Введите имя", reply_markup = types.ReplyKeyboardRemove())
+        elif message.text == "Далее":
+            user = data[message.from_user.id]
+            print(user.get_user_data())
+            if user.isFull():
+                user.write_user()
+                await message.reply(f'<b>Успешно!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
+                await state.finish()
+                await TaxiState.taxi_service_main
+            else: pass
+
 @dp.message_handler(state=TaxiState.taxi_service_reg)
 async def taxi_reg(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
@@ -111,11 +131,26 @@ async def taxi_reg(message: types.Message, state: FSMContext):
             user = taxiuser(message.from_user.id)
             data[message.from_user.id] = user
             if user.isFull():
-                await message.answer(f'<b>Ваш аккаунт найден!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish, allow_sending_without_reply=True)
+                await message.reply(f'<b>Ваш аккаунт найден!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
             else:
-                await message.answer(f'<b>Необходимо закончить регистрацию!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg, allow_sending_without_reply=True)
-        
-    
+                await message.reply(f'<b>Необходимо закончить регистрацию!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
+            await TaxiState.taxi_service_reg_main
+
+@dp.message_handler(state=TaxiState.taxi_service_reg_name)
+async def taxi_reg(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        user = data[message.from_user.id]
+        user.update(name = message.text)
+        data[message.from_user.id] = user
+        await message.reply(f'<b>Получено новое имя - {user.name}</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+        await TaxiState.taxi_service_reg.set()
+
+@dp.message_handler(state=TaxiState.taxi_service_reg_name, content_types=types.ContentType.CONTACT)
+async def taxi_reg(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        user = data[message.from_user.id]
+        user.update(phone_number = message.contact.phone_number)
+        data[message.from_user.id] = user
 
 @dp.message_handler(state="*")
 async def silkway(message: types.Message):

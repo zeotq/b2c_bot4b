@@ -24,7 +24,7 @@ kb_taxi_0 = [
 
 kb_taxi_1 = [
     [
-        KeyboardButton(text="Номер телефона"),
+        KeyboardButton(text="Номер телефона", request_contact=True),
         KeyboardButton(text="Имя"),
     ],
     [
@@ -34,7 +34,7 @@ kb_taxi_1 = [
 
 kb_taxi_2 = [
     [
-        KeyboardButton(text="Номер телефона"),
+        KeyboardButton(text="Номер телефона", request_contact=True),
         KeyboardButton(text="Имя"),
     ],
     [
