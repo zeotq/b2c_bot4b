@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 import user_data_save
 import users_db
 import keyboards
-import taxiuser
+from taxiuser import taxiuser
 
 with open("token.txt", "r") as f:
     TOKEN = f.readline()
