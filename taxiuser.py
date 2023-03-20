@@ -3,9 +3,16 @@ import sqlite3 as sql
 class taxiuser(object):
 
     def __init__(self, uid, phone_number: str = None, name: str = None) -> None:
+        connection = sql.connect('users_taxi.db')
+        db_data = connection.execute(f"""SELECT * FROM users WHERE id = {uid}""").fetchone()
+        if db_data is None:
             self.id = uid
             self.name = name
             self.phone_number = phone_number
+        else:
+            self.id == uid
+            self.phone_number = db_data[1]
+            self.name = db_data[2]
 
     def __eq__(self, __o: object) -> bool:
         if self.id == __o.id:

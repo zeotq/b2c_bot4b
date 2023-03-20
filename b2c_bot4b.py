@@ -118,7 +118,10 @@ async def taxi_reg_main(message: types.Message, state: FSMContext):
 async def taxi_reg_main(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         user = data[message.from_user.id]
-        if user.isFull:
+        print(user.get_user_data())
+        if user.isFull():
+            print("chtck_0")
+            print(user.get_user_data())
             await message.answer(f'<b>Вы можете продожить или изменить данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
         if message.text == "Имя":
             await TaxiState.service_reg_name.set()
