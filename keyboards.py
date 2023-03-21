@@ -1,5 +1,4 @@
-﻿from tkinter.tix import ROW
-from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+﻿from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types.web_app_info import WebAppInfo
 
 kb_main = [
@@ -90,4 +89,4 @@ keyboard_taxi_main = ReplyKeyboardMarkup(
 keyboard_commode = InlineKeyboardMarkup(
     row_width=1
 )
-keyboard_commode.add(kb_commode[0], kb_commode[1], kb_commode[2])
+
