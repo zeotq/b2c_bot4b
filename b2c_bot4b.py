@@ -128,10 +128,10 @@ async def taxi_reg_main(message: types.Message):
         if message.text == "Имя":
             await TaxiState.service_reg_name.set()
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
-        else:
+        elif message.text == "Далее":
             if user.isFull():
                 user.write_user()
-                await message.answer(f'<b>Успешно!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
+                await message.answer(f'<b>Данные сохранены!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
                 await TaxiState.service_main.set()
             else: pass
         print(user_data[f"{message.from_user.id}"].get_user_data())
@@ -156,9 +156,9 @@ async def taxi_reg_name(message: types.Message):
         user.update(name = message.text)
         user_data[f"{message.from_user.id}"] = user
         if user.isFull():
-            await message.answer(f'Имя пользователя <b>{user.name}</b> сохранено', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+            await message.answer(f'Имя пользователя <b>{user.name}</b> добавлена', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
         else:
-            await message.answer(f'Имя пользователя <b>{user.name}</b> сохранено', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
+            await message.answer(f'Имя пользователя <b>{user.name}</b> добавлено', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
         await TaxiState.service_reg_main.set()
         print(user_data[f"{message.from_user.id}"].get_user_data())
 
