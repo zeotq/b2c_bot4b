@@ -39,9 +39,20 @@ kb_taxi_2 = [
     ],
     [
         KeyboardButton(text="Закрыть"),
-        KeyboardButton(text="Далее")    
+        KeyboardButton(text="Сохранить")    
     ]
 ]
+
+kb_taxi_main = [
+    [
+        KeyboardButton(text="Заказать машину", request_location=True),
+    ],
+    [
+        KeyboardButton(text="Изменить данные"),
+        KeyboardButton(text="Закрыть")
+    ]
+]
+
 
 kb_admin = [
     [
@@ -69,6 +80,10 @@ keyboard_taxi_reg = ReplyKeyboardMarkup(
 )
 keyboard_taxi_reg_finish = ReplyKeyboardMarkup(
     keyboard=kb_taxi_2,
+    resize_keyboard=True,
+)
+keyboard_taxi_main = ReplyKeyboardMarkup(
+    keyboard=kb_taxi_main,
     resize_keyboard=True,
 )
 

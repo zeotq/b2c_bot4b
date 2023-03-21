@@ -113,7 +113,6 @@ async def taxi_reg_main(message: types.Message):
          user = user_data[f"{message.from_user.id}"]
          user.update(phone_number=message.contact.phone_number)
          user_data[f"{message.from_user.id}"] = user
-         print(user_data[f"{message.from_user.id}"].get_user_data())
          if user.isFull():
              await message.answer(f'Номер <b>{user.phone_number}</b> сохранён', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
 
@@ -121,20 +120,18 @@ async def taxi_reg_main(message: types.Message):
 async def taxi_reg_main(message: types.Message):
         global user_data
         user = user_data[f"{message.from_user.id}"]
-        user.update(name = message.text)
-        user_data[f"{message.from_user.id}"] = user
         if user.isFull():
             await message.answer(f'<b>Вы можете продожить или изменить данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
         if message.text == "Имя":
             await TaxiState.service_reg_name.set()
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
-        elif message.text == "Далее":
+        elif message.text == "Сохранить":
             if user.isFull():
                 user.write_user()
+                user_data[f"{message.from_user.id}"] = None
                 await message.answer(f'<b>Данные сохранены!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
                 await TaxiState.service_main.set()
             else: pass
-        print(user_data[f"{message.from_user.id}"].get_user_data())
 
 @dp.message_handler(state=TaxiState.service_reg)
 async def taxi_reg_0(message: types.Message):
@@ -147,7 +144,6 @@ async def taxi_reg_0(message: types.Message):
             else:
                 await message.answer(f'<b>Укажите актуальные номер телефона и имя</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
             await TaxiState.service_reg_main.set()
-            print(user_data[f"{message.from_user.id}"].get_user_data())
 
 @dp.message_handler(state=TaxiState.service_reg_name)
 async def taxi_reg_name(message: types.Message):
