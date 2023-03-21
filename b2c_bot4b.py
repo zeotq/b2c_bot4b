@@ -18,7 +18,7 @@ with open("token.txt", "r") as f:
     dp = Dispatcher(bot, storage=storage)
 
 user_data = dict()
-#commode = texts.formal
+commode = texts.formal
 
 class GlobalState(StatesGroup):
     main_menu = State()
@@ -36,7 +36,7 @@ class Form_Admin(StatesGroup):
 
 @dp.message_handler(commands=['start'])
 async def start_command(message: types.Message):
-    await message.answer('<b>Добро пожаловать!</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu)
+    await message.answer(f'<b>{commode.get("hello")}</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu)
     user_data_save.data_writer(dict(message.from_user))
     await message.delete()
     await GlobalState.first()

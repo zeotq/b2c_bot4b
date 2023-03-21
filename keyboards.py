@@ -63,12 +63,6 @@ kb_admin = [
     ]
 ]
 
-kb_commode = [
-        InlineKeyboardButton(text = "Вежливый", callback_data='good'),
-        InlineKeyboardButton(text = "Ханыга (Илья)", callback_data='stupid'),
-        InlineKeyboardButton(text = "Слишком вежливый", callback_data='bad')
-]
-
 keyboard_main_menu = ReplyKeyboardMarkup(
     keyboard=kb_main,
     resize_keyboard=True,
