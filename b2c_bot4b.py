@@ -18,6 +18,7 @@ with open("token.txt", "r") as f:
     dp = Dispatcher(bot, storage=storage)
 
 user_data = dict()
+#commode = texts.formal
 
 class GlobalState(StatesGroup):
     main_menu = State()
@@ -46,11 +47,9 @@ async def menu_command(message: types.Message):
     await message.delete()
     await GlobalState.first()
 
-
-@dp.message_handeler(commands=['set'], state = "*")
+@dp.message_handler(commands=['set_commode'], state = "*")
 async def set_commode(message:types.Message):
-    await message.answer('Выберите режим общения', parse_mode="HTML", reply_markup = keyboards.keyboard_commode)
-
+    await message.answer('Выберите режим общения', reply_markup = keyboards.keyboard_commode)
 
 @dp.message_handler(commands=['help'], state = "*")
 async def help_command(message: types.Message):

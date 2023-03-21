@@ -64,13 +64,9 @@ kb_admin = [
 ]
 
 kb_commode = [
-    [
-        InlineKeyboardButton(text = "Вежливый"),
-        InlineKeyboardButton(text = "Ханыга (Илья)"),
-        InlineKeyboardButton(text = "Слишком вежливый")
-    ]
-    
-    
+        InlineKeyboardButton(text = "Вежливый", callback_data='good'),
+        InlineKeyboardButton(text = "Ханыга (Илья)", callback_data='stupid'),
+        InlineKeyboardButton(text = "Слишком вежливый", callback_data='bad')
 ]
 
 keyboard_main_menu = ReplyKeyboardMarkup(
@@ -98,7 +94,6 @@ keyboard_taxi_main = ReplyKeyboardMarkup(
     resize_keyboard=True,
 )
 keyboard_commode = InlineKeyboardMarkup(
-    row_width=3, inline_keyboard=kb_commode
-    
+    row_width=1
 )
-
+keyboard_commode.add(kb_commode[0], kb_commode[1], kb_commode[2])
