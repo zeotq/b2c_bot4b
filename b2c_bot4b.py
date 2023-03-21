@@ -114,7 +114,7 @@ async def taxi_reg_main(message: types.Message):
          user.update(phone_number=message.contact.phone_number)
          user_data[f"{message.from_user.id}"] = user
          if user.isFull():
-             await message.answer(f'Номер <b>{user.phone_number}</b> сохранён', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+             await message.answer(f'Номер <b>{user.phone_number}</b> добавлен', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
 
 @dp.message_handler(state=TaxiState.service_reg_main)
 async def taxi_reg_main(message: types.Message):
@@ -127,9 +127,9 @@ async def taxi_reg_main(message: types.Message):
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
         elif message.text == "Сохранить":
             if user.isFull():
-                user.write_user()
+                user.write()
                 user_data[f"{message.from_user.id}"] = None
-                await message.answer(f'<b>Данные сохранены!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0)
+                await message.answer(f'<b>Данные сохранены!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_main)
                 await TaxiState.service_main.set()
             else: pass
 
@@ -158,6 +158,13 @@ async def taxi_reg_name(message: types.Message):
         await TaxiState.service_reg_main.set()
         print(user_data[f"{message.from_user.id}"].get_user_data())
 
+@dp.message_handler(state=TaxiState.service_main, content_types=types.ContentType.LOCATION)
+async def taxi_reg_0(message: types.Message):
+    user = taxiuser(message.from_user.id)
+    print(message.location)
+    user.update(location=message.location)
+    user.write()
+
 @dp.message_handler(state="*")
 async def silkway(message: types.Message):
     text = message.text
@@ -165,6 +172,7 @@ async def silkway(message: types.Message):
         await TaxiState.service_reg.set()
         await message.answer('<b>Сервис такси:</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0, allow_sending_without_reply=True)
     elif text == "Доставка еды 🥂":
+        await message.answer('<b>В настоящий момент ресторан закрыт.</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_0, allow_sending_without_reply=True)
         await TaxiState.service_reg.set()
     elif text == "Информация о проекте":
         pass
