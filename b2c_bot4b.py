@@ -8,6 +8,7 @@ import user_data_save
 import users_db
 import keyboards
 import getgeoinfo
+import texts
 from taxiuser import taxiuser
 
 with open("token.txt", "r") as f:
@@ -25,6 +26,7 @@ class TaxiState(StatesGroup):
     service_reg_main = State()
     service_reg_name = State()
     service_main = State()
+    service_wait = State()
 class Form_Admin(StatesGroup):
     page_0 = State()
     page_2 = State()
@@ -43,6 +45,12 @@ async def menu_command(message: types.Message):
     await message.answer('<b>Главное меню</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_main_menu)
     await message.delete()
     await GlobalState.first()
+
+
+@dp.message_handeler(commands=['set'], state = "*")
+async def set_commode(message:types.Message):
+    await message.answer('Выберите режим общения', parse_mode="HTML", reply_markup = keyboards.keyboard_commode)
+
 
 @dp.message_handler(commands=['help'], state = "*")
 async def help_command(message: types.Message):
@@ -168,12 +176,26 @@ async def taxi_reg_name(message: types.Message):
         print(user_data[f"{message.from_user.id}"].get_data())
 
 @dp.message_handler(state=TaxiState.service_main, content_types=types.ContentType.LOCATION)
-async def taxi_reg_0(message: types.Message):
+async def taxi_main_loc(message: types.Message):
     user = taxiuser(message.from_user.id)
-    pos_s, pos_d = float(message.location["longitude"]), float(message.location["latitude"])
+    pos_s, pos_d = float(message.location["latitude"]), float(message.location["longitude"])
     user.update(location=message.location)
     user.write()
-    print(getgeoinfo.adress(pos_s, pos_d))
+    data = (getgeoinfo.adress(pos_s, pos_d))
+    await message.answer(f'<b>{user.name}</b>, ваше местоположение:\n{data}\n\nВ течение 1 минуты Вам напишет оператор.', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+
+@dp.message_handler(state=TaxiState.service_main)
+async def taxi_main(message: types.Message):
+    if message.text == "Изменить данные":
+        user = taxiuser(message.from_user.id)
+        user_data[f"{message.from_user.id}"] = user
+        await message.answer(f'Имя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+        await TaxiState.service_reg_main.set()
+    elif message.text == "Закрыть":
+        await message.answer(text='Открыть снова - /menu', reply_markup = types.ReplyKeyboardRemove())
+        await message.delete()
+        await asyncio.sleep(delay = 5)
+
 
 @dp.message_handler(state="*")
 async def silkway(message: types.Message):

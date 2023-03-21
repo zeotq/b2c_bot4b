@@ -1,4 +1,5 @@
-﻿from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+﻿from tkinter.tix import ROW
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.types.web_app_info import WebAppInfo
 
 kb_main = [
@@ -45,7 +46,7 @@ kb_taxi_2 = [
 
 kb_taxi_main = [
     [
-        KeyboardButton(text="Заказать машину", request_location=True),
+        KeyboardButton(text="Вызвать такси", request_location=True),
     ],
     [
         KeyboardButton(text="Изменить данные"),
@@ -59,7 +60,17 @@ kb_admin = [
         KeyboardButton(text = "get_user_by_id"),
         KeyboardButton(text = "add_comment"),
         KeyboardButton(text = "set_trustfactor")
-        ]
+    ]
+]
+
+kb_commode = [
+    [
+        InlineKeyboardButton(text = "Вежливый"),
+        InlineKeyboardButton(text = "Ханыга (Илья)"),
+        InlineKeyboardButton(text = "Слишком вежливый")
+    ]
+    
+    
 ]
 
 keyboard_main_menu = ReplyKeyboardMarkup(
@@ -85,5 +96,9 @@ keyboard_taxi_reg_finish = ReplyKeyboardMarkup(
 keyboard_taxi_main = ReplyKeyboardMarkup(
     keyboard=kb_taxi_main,
     resize_keyboard=True,
+)
+keyboard_commode = InlineKeyboardMarkup(
+    row_width=3, inline_keyboard=kb_commode
+    
 )
 
