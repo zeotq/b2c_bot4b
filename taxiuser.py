@@ -42,7 +42,7 @@ class taxiuser(object):
         if connection.execute(f"""SELECT * FROM users WHERE id = {self.id}""").fetchone() == None:
             command = f"""INSERT INTO users (id, phone, name, location) values ('{self.id}', '{self.phone_number}', '{self.name}', '{self.location}')"""
         else:
-            command = f"""UPDATE users set (phone, name, location) = ('{self.phone_number}', '{self.name}', '{self.location}) WHERE ID = '{self.id}'"""
+            command = f"""UPDATE users set (phone, name, location) = ('{self.phone_number}', '{self.name}', '{self.location}') WHERE ID = '{self.id}'"""
         connection.execute(command)
         connection.commit()
         connection.close()

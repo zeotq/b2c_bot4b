@@ -7,7 +7,7 @@ kb_main = [
             KeyboardButton(text="Доставка еды 🥂"),
         ],
         [
-            KeyboardButton(text="Информация о проекте"),
+            KeyboardButton(text="/help"),
         ],
         [
             KeyboardButton("GitHub", web_app=WebAppInfo(url = "https://github.com/zeotq/b2c_bot4b.git"))

@@ -7,6 +7,7 @@ from aiogram.dispatcher import FSMContext
 import user_data_save
 import users_db
 import keyboards
+import getgeoinfo
 from taxiuser import taxiuser
 
 with open("token.txt", "r") as f:
@@ -121,7 +122,7 @@ async def taxi_reg_main(message: types.Message):
         global user_data
         user = user_data[f"{message.from_user.id}"]
         if user.isFull():
-            await message.answer(f'<b>Вы можете продожить или изменить данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
+            await message.answer(f'<b>Убедитесь, что указаны актуальные данные</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg_finish)
         if message.text == "Имя":
             await TaxiState.service_reg_name.set()
             await message.answer("Введите имя:", reply_markup = types.ReplyKeyboardRemove())
@@ -132,6 +133,10 @@ async def taxi_reg_main(message: types.Message):
                 await message.answer(f'<b>Данные сохранены!</b>\nИмя: {user.name}\nНомер телефона: {user.phone_number}', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_main)
                 await TaxiState.service_main.set()
             else: pass
+        elif message.text == "Закрыть":
+            await message.answer(text='Открыть снова - /menu', reply_markup = types.ReplyKeyboardRemove())
+            await message.delete()
+            await asyncio.sleep(delay = 5)
 
 @dp.message_handler(state=TaxiState.service_reg)
 async def taxi_reg_0(message: types.Message):
@@ -144,6 +149,10 @@ async def taxi_reg_0(message: types.Message):
             else:
                 await message.answer(f'<b>Укажите актуальные номер телефона и имя</b>', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
             await TaxiState.service_reg_main.set()
+        elif message.text == "Закрыть":
+            await message.answer(text='Открыть снова - /menu', reply_markup = types.ReplyKeyboardRemove())
+            await message.delete()
+            await asyncio.sleep(delay = 5)
 
 @dp.message_handler(state=TaxiState.service_reg_name)
 async def taxi_reg_name(message: types.Message):
@@ -156,14 +165,15 @@ async def taxi_reg_name(message: types.Message):
         else:
             await message.answer(f'Имя пользователя <b>{user.name}</b> добавлено', parse_mode="HTML", reply_markup = keyboards.keyboard_taxi_reg)
         await TaxiState.service_reg_main.set()
-        print(user_data[f"{message.from_user.id}"].get_user_data())
+        print(user_data[f"{message.from_user.id}"].get_data())
 
 @dp.message_handler(state=TaxiState.service_main, content_types=types.ContentType.LOCATION)
 async def taxi_reg_0(message: types.Message):
     user = taxiuser(message.from_user.id)
-    print(message.location)
+    pos_s, pos_d = float(message.location["longitude"]), float(message.location["latitude"])
     user.update(location=message.location)
     user.write()
+    print(getgeoinfo.adress(pos_s, pos_d))
 
 @dp.message_handler(state="*")
 async def silkway(message: types.Message):
@@ -184,7 +194,8 @@ async def silkway(message: types.Message):
         data = [
         "Я тебя не понял", "Команда не распознана", "Проверьте корректность сообщения", "Нет"
         ]
-        await message.answer(text = choice(data))
+        await message.answer(text = choice(data), reply_markup = keyboards.keyboard_main_menu)
+        await GlobalState.main_menu.set()
 
 if __name__ == '__main__':
     executor.start_polling(dp)
